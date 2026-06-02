@@ -1,331 +1,364 @@
-# Industrial Data API
+# Industrial Process Data API
 
-Industrial Data API is a beginner-friendly, production-style FastAPI backend for storing, importing, and analyzing machine process measurements.
+A backend service for storing, processing, and analyzing industrial machine process data.
 
-The project is designed as a GitHub portfolio backend. It demonstrates clean API design, SQLAlchemy ORM usage, PostgreSQL integration, Docker Compose setup, service-layer separation, input validation, error handling, CSV import, and automated endpoint tests without adding unnecessary complexity.
+This project was developed to strengthen my backend and data engineering skills using technologies commonly found in modern data-driven software systems. The industrial monitoring use case was chosen because of my academic background in machine learning for manufacturing processes and my experience in industrial software development.
 
-## Portfolio Summary
+---
 
-This backend simulates a small industrial monitoring service. A factory or workshop could use a service like this to store machine measurements such as temperature, RPM, and tool wear, then review basic statistics for process monitoring.
+## Features
 
-The project demonstrates:
+- REST API for machine measurements
+- PostgreSQL data persistence
+- CSV-based ETL import
+- Statistical process analysis
+- Dockerized deployment
+- Input validation with Pydantic
+- Automated API documentation with Swagger UI
+- Automated tests
 
-- REST API development with FastAPI
-- PostgreSQL persistence with SQLAlchemy ORM
-- Pydantic request and response validation
-- Clean separation between routes, services, schemas, models, and database configuration
-- CSV ETL import for batch measurement data
-- Basic analytics using SQL aggregate functions
-- Docker Compose for local development
-- Unit tests for core API endpoints
+---
 
-## Tech Stack
+## Application Overview
 
-- Python 3.12
-- FastAPI
-- PostgreSQL
-- SQLAlchemy ORM
-- Pydantic
-- Pytest
-- Docker
-- Docker Compose
+The application provides a simple but realistic backend architecture for collecting, storing, processing, and analyzing industrial process data. Machine measurements can be created through REST endpoints, stored in PostgreSQL, imported from CSV files, and analyzed through aggregated statistics.
+
+**Screenshot Placeholder – Main Swagger Overview**
+
+```text
+<img width="1457" height="867" alt="Front" src="https://github.com/user-attachments/assets/f1c0d5de-379a-41e5-8bcc-923a805d50dd" />
+```
+
+---
+
+## Motivation
+
+Modern industrial systems generate large amounts of machine and process data that must be collected, stored, and analyzed efficiently. This project demonstrates a typical backend workflow used in data-driven applications:
+
+1. Data ingestion through REST APIs
+2. Persistent storage in a relational database
+3. ETL processing of external datasets
+4. Statistical analysis of collected measurements
+5. Containerized deployment using Docker
+
+The project combines concepts from backend development, data engineering, and industrial analytics.
+
+---
+
+## Technology Stack
+
+| Category | Technology |
+|-----------|-----------|
+| Language | Python 3.12 |
+| API Framework | FastAPI |
+| Database | PostgreSQL |
+| ORM | SQLAlchemy |
+| Validation | Pydantic |
+| Containerization | Docker & Docker Compose |
+| Testing | Pytest |
+| Documentation | Swagger / OpenAPI |
+
+---
 
 ## Architecture
 
 ```text
-                       +--------------------------+
-                       |        API Client        |
-                       |  Swagger / curl / tests  |
-                       +------------+-------------+
-                                    | HTTP
-                                    v
-+----------------------------------------------------------------+
-|                         FastAPI App                            |
-|                                                                |
-|  +--------------+     +--------------+     +--------------+    |
-|  | Measurements |     |     ETL      |     |   Analysis   |    |
-|  |    Routes    |     |    Routes    |     |    Routes    |    |
-|  +------+-------+     +------+-------+     +------+-------+    |
-|         |                    |                    |            |
-|         v                    v                    v            |
-|  +----------------------------------------------------------+  |
-|  |                    Service Layer                         |  |
-|  |  MeasurementService | CsvEtlService | AnalysisService    |  |
-|  +--------------------------+-------------------------------+  |
-|                             |                                  |
-|                             v                                  |
-|  +----------------------------------------------------------+  |
-|  |                 SQLAlchemy ORM Model                     |  |
-|  |                      Measurement                         |  |
-|  +--------------------------+-------------------------------+  |
-+-----------------------------|----------------------------------+
-                              |
-                              v
-                    +----------------------+
-                    |      PostgreSQL      |
-                    |  measurements table  |
-                    +----------------------+
+Client
+   │
+   ▼
+FastAPI REST API
+   │
+   ├── Measurement Service
+   ├── Analysis Service
+   └── ETL Service
+   │
+   ▼
+SQLAlchemy ORM
+   │
+   ▼
+PostgreSQL Database
 ```
+
+The architecture separates business logic from API endpoints through dedicated service layers. This keeps the codebase maintainable and scalable while following common backend development practices.
+
+---
 
 ## Project Structure
 
 ```text
 industrial-data-api/
+
 ├── app/
-│   ├── main.py                     # FastAPI app, startup, exception handlers
-│   ├── database/
-│   │   ├── base.py                 # SQLAlchemy declarative base
-│   │   └── session.py              # Database engine and session dependency
+│   ├── main.py
+│   ├── database.py
+│   │
 │   ├── models/
-│   │   └── measurement.py          # SQLAlchemy Measurement model
-│   ├── routes/
-│   │   ├── measurements.py         # CRUD endpoints
-│   │   ├── etl.py                  # CSV import endpoint
-│   │   └── analysis.py             # Summary endpoint
 │   ├── schemas/
-│   │   └── measurement.py          # Pydantic validation and response schemas
-│   └── services/
-│       ├── measurement_service.py  # CRUD business logic
-│       ├── etl_service.py          # CSV parsing/import logic
-│       └── analysis_service.py     # SQL aggregate queries
+│   ├── routes/
+│   ├── services/
+│   └── config.py
+│
 ├── tests/
-│   └── test_measurements.py        # Endpoint tests using SQLite
+├── sample_data/
+│
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-├── .env.example
 └── README.md
 ```
 
-## Data Model
+---
 
-| Field | Type | Validation | Description |
-| --- | --- | --- | --- |
-| `id` | integer | Auto-generated | Primary key |
-| `machine_id` | string | 1-100 characters, not blank | Machine identifier |
-| `temperature` | float | -50 to 250 | Machine/process temperature |
-| `rpm` | float | 0 to 50000 | Machine RPM |
-| `tool_wear` | float | 0 to 100 | Tool wear percentage/value |
-| `timestamp` | datetime | Optional ISO 8601 datetime | Measurement time |
+# API Endpoints
 
-If `timestamp` is omitted, the backend stores the current UTC time.
+## Measurements
 
-## Running with Docker Compose
+| Method | Endpoint | Description |
+|----------|----------|----------|
+| POST | `/measurements` | Create measurement |
+| GET | `/measurements` | List measurements |
+| GET | `/measurements/{id}` | Get single measurement |
+| DELETE | `/measurements/{id}` | Delete measurement |
+
+### Creating Measurements
+
+Machine process measurements can be created through a REST endpoint.
+
+Example:
+
+```json
+{
+  "machine_id": "MACHINE-001",
+  "temperature": 71.2,
+  "rpm": 1450,
+  "tool_wear": 12.3,
+  "timestamp": "2026-06-02T09:15:00Z"
+}
+```
+
+**Screenshot Placeholder – Create Measurement**
+
+```text
+<img width="1438" height="911" alt="CreateMeasurement" src="https://github.com/user-attachments/assets/7f5c1ef0-8562-4d76-bc13-bf179ca0fa72" />
+```
+
+---
+
+### Retrieving Measurements
+
+Stored measurements can be queried through the API. Results are retrieved directly from PostgreSQL using SQLAlchemy ORM.
+
+**Screenshot Placeholder – Measurement List**
+
+```text
+<img width="1437" height="910" alt="ListMeasurements" src="https://github.com/user-attachments/assets/20c404bf-f4c5-4ecf-bd2b-25c2e686751f" />
+```
+
+---
+
+## ETL
+
+| Method | Endpoint | Description |
+|----------|----------|----------|
+| POST | `/etl/import-csv` | Import measurement data from CSV |
+
+The ETL endpoint allows bulk ingestion of measurement data from external CSV files.
+
+Workflow:
+
+```text
+CSV File
+   │
+   ▼
+Validation
+   │
+   ▼
+Transformation
+   │
+   ▼
+PostgreSQL Import
+```
+
+This simulates a common data engineering workflow for loading external process datasets.
+
+---
+
+## Analysis
+
+| Method | Endpoint | Description |
+|----------|----------|----------|
+| GET | `/analysis/summary` | Statistical summary |
+
+The analysis endpoint calculates:
+
+- Minimum values
+- Maximum values
+- Average values
+
+for:
+
+- Temperature
+- RPM
+- Tool Wear
+
+Example response:
+
+```json
+{
+  "temperature": {
+    "min": 71.2,
+    "max": 72.5,
+    "average": 71.85
+  },
+  "rpm": {
+    "min": 1450,
+    "max": 1450,
+    "average": 1450
+  },
+  "tool_wear": {
+    "min": 12.3,
+    "max": 12.7,
+    "average": 12.5
+  }
+}
+```
+
+**Screenshot Placeholder – Analysis Endpoint**
+
+```text
+<img width="1439" height="911" alt="Analysis" src="https://github.com/user-attachments/assets/77391328-3d32-4beb-b205-c3d49e600029" />
+```
+
+---
+
+## Health Monitoring
+
+| Method | Endpoint | Description |
+|----------|----------|----------|
+| GET | `/health` | Health check |
+
+The health endpoint can be used to verify that the application is running and responsive.
+
+---
+
+## Running the Project
+
+### Prerequisites
+
+- Docker Desktop
+- Docker Compose
+
+---
+
+### Start Application
 
 ```bash
-git clone https://github.com/your-username/industrial-data-api.git
-cd industrial-data-api
-cp .env.example .env
 docker compose up --build
 ```
 
-Windows Command Prompt:
+---
 
-```cmd
-copy .env.example .env
-docker compose up --build
+### Open Swagger Documentation
+
+```text
+http://localhost:8000/docs
 ```
 
-Services:
+---
 
-- API: http://localhost:8000
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-- Health check: http://localhost:8000/health
-
-Stop the project:
+### Stop Application
 
 ```bash
 docker compose down
 ```
 
-Remove the database volume too:
+---
+
+## Example Workflow
+
+### 1. Create Measurement
+
+```http
+POST /measurements
+```
+
+### 2. Retrieve Measurements
+
+```http
+GET /measurements
+```
+
+### 3. Import CSV Dataset
+
+```http
+POST /etl/import-csv
+```
+
+### 4. Run Analysis
+
+```http
+GET /analysis/summary
+```
+
+---
+
+## Testing
+
+Run tests using:
 
 ```bash
-docker compose down -v
-```
-
-## API Endpoints
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/health` | Health check |
-| `POST` | `/measurements` | Create a measurement |
-| `GET` | `/measurements` | List measurements with pagination |
-| `GET` | `/measurements/{id}` | Get one measurement by ID |
-| `DELETE` | `/measurements/{id}` | Delete one measurement by ID |
-| `POST` | `/etl/import-csv` | Import measurements from CSV |
-| `GET` | `/analysis/summary` | Get min, max, and average values |
-
-## Example API Requests and Responses
-
-### Create a measurement
-
-```bash
-curl -X POST "http://localhost:8000/measurements" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "machine_id": "MACHINE-001",
-    "temperature": 72.5,
-    "rpm": 1450,
-    "tool_wear": 12.7,
-    "timestamp": "2026-06-02T09:30:00Z"
-  }'
-```
-
-```json
-{
-  "machine_id": "MACHINE-001",
-  "temperature": 72.5,
-  "rpm": 1450,
-  "tool_wear": 12.7,
-  "timestamp": "2026-06-02T09:30:00Z",
-  "id": 1
-}
-```
-
-### List measurements
-
-```bash
-curl "http://localhost:8000/measurements?skip=0&limit=10"
-```
-
-```json
-{
-  "items": [
-    {
-      "machine_id": "MACHINE-001",
-      "temperature": 72.5,
-      "rpm": 1450,
-      "tool_wear": 12.7,
-      "timestamp": "2026-06-02T09:30:00Z",
-      "id": 1
-    }
-  ],
-  "total": 1
-}
-```
-
-### Delete a measurement
-
-```bash
-curl -X DELETE "http://localhost:8000/measurements/1"
-```
-
-```text
-204 No Content
-```
-
-### Import measurements from CSV
-
-```csv
-machine_id,temperature,rpm,tool_wear,timestamp
-MACHINE-001,72.5,1450,12.7,2026-06-02T09:30:00Z
-MACHINE-002,80.1,1320,18.4,2026-06-02T09:31:00Z
-MACHINE-001,74.2,1500,13.1,
-```
-
-```bash
-curl -X POST "http://localhost:8000/etl/import-csv" \
-  -F "file=@measurements.csv"
-```
-
-```json
-{
-  "imported": 3,
-  "failed": 0,
-  "errors": []
-}
-```
-
-### Get analysis summary
-
-```bash
-curl "http://localhost:8000/analysis/summary"
-```
-
-```json
-{
-  "temperature": {"min": 72.5, "max": 80.1, "average": 75.6},
-  "rpm": {"min": 1320, "max": 1500, "average": 1423.33},
-  "tool_wear": {"min": 12.7, "max": 18.4, "average": 14.07}
-}
-```
-
-## Error Handling Examples
-
-### Validation error
-
-```json
-{
-  "error": "Validation error",
-  "detail": [
-    {
-      "type": "less_than_equal",
-      "loc": ["body", "temperature"],
-      "msg": "Input should be less than or equal to 250",
-      "input": 999,
-      "ctx": {"le": 250.0}
-    }
-  ]
-}
-```
-
-### Not found error
-
-```json
-{
-  "detail": "Measurement not found"
-}
-```
-
-### CSV row error
-
-```json
-{
-  "imported": 2,
-  "failed": 1,
-  "errors": [
-    "Row 3: could not convert string to float: 'bad-value'"
-  ]
-}
-```
-
-## Running Tests
-
-The tests use SQLite in memory, so PostgreSQL and Docker are not required for the test suite.
-
-```bash
-pip install -r requirements.txt
 pytest
 ```
 
-Current tests cover:
+---
 
-- Creating measurements
-- Getting a measurement by ID
-- Listing measurements
-- Deleting measurements
-- Rejecting invalid input
-- Returning analysis summaries
+## Skills Demonstrated
 
-## Design Choices
+This project demonstrates practical experience with:
 
-- Routes stay thin and handle HTTP details.
-- Service classes contain CRUD, CSV import, and analysis logic.
-- PostgreSQL is used for local development through Docker Compose.
-- SQLite is used for tests to keep them fast and easy to run.
-- Tables are created automatically at startup for a beginner-friendly setup.
-- In a real production deployment, Alembic migrations should replace automatic table creation.
+- Backend Development
+- REST API Design
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Docker
+- Data Engineering Concepts
+- ETL Pipelines
+- Data Processing
+- API Documentation
+- Software Architecture
+- Automated Testing
 
-## Possible Improvements
+---
 
-This project intentionally stays small. Useful next steps would be:
+## Future Improvements
 
-- Add Alembic migrations
-- Add filtering by `machine_id` and timestamp range
-- Add authentication for write operations
-- Add structured logging
+Potential extensions for future development:
+
+- Authentication and authorization
+- User management
+- Time-series analytics
+- Machine-specific dashboards
+- Advanced ETL workflows
+- CI/CD integration
+- Cloud deployment (Azure / AWS)
+- Monitoring and observability
+
+---
+
+## Author
+
+**Lukas Dregger**
+
+M.Sc. Mechatronics and Robotics
+
+Areas of Interest:
+
+- Backend Development
+- Data Engineering
+- Machine Learning
+- Industrial Software Systems
+- Process Automation
 - Add CI workflow for running tests on GitHub Actions
 
 ## License
