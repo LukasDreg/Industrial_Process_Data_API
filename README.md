@@ -25,9 +25,7 @@ The application provides a simple but realistic backend architecture for collect
 
 **Screenshot Placeholder – Main Swagger Overview**
 
-```text
 ![Application Overview](images/Front.png)
-```
 
 ---
 
@@ -139,9 +137,7 @@ Example:
 
 **Screenshot Placeholder – Create Measurement**
 
-```text
 ![Create Measurement](images/CreateMeasurement.png)
-```
 
 ---
 
@@ -151,9 +147,7 @@ Stored measurements can be queried through the API. Results are retrieved direct
 
 **Screenshot Placeholder – Measurement List**
 
-```text
 ![Measurement List](images/ListMeasurements.png)
-```
 
 ---
 
@@ -226,9 +220,7 @@ Example response:
 
 **Screenshot Placeholder – Analysis Endpoint**
 
-```text
 ![Analysis Endpoint](images/Analysis.png)
-```
 
 ---
 
