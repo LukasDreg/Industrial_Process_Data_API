@@ -26,7 +26,7 @@ The application provides a simple but realistic backend architecture for collect
 **Screenshot Placeholder – Main Swagger Overview**
 
 ```text
-<img width="1457" height="867" alt="Front" src="https://github.com/user-attachments/assets/f1c0d5de-379a-41e5-8bcc-923a805d50dd" />
+![Application Overview](images/front.png)
 ```
 
 ---
@@ -98,6 +98,7 @@ industrial-data-api/
 │   ├── services/
 │   └── config.py
 │
+├── images/
 ├── tests/
 ├── sample_data/
 │
@@ -139,7 +140,7 @@ Example:
 **Screenshot Placeholder – Create Measurement**
 
 ```text
-<img width="1438" height="911" alt="CreateMeasurement" src="https://github.com/user-attachments/assets/7f5c1ef0-8562-4d76-bc13-bf179ca0fa72" />
+![Create Measurement](images/create-measurement.png)
 ```
 
 ---
@@ -151,7 +152,7 @@ Stored measurements can be queried through the API. Results are retrieved direct
 **Screenshot Placeholder – Measurement List**
 
 ```text
-<img width="1437" height="910" alt="ListMeasurements" src="https://github.com/user-attachments/assets/20c404bf-f4c5-4ecf-bd2b-25c2e686751f" />
+![Measurement List](images/list-measurements.png)
 ```
 
 ---
@@ -226,7 +227,7 @@ Example response:
 **Screenshot Placeholder – Analysis Endpoint**
 
 ```text
-<img width="1439" height="911" alt="Analysis" src="https://github.com/user-attachments/assets/77391328-3d32-4beb-b205-c3d49e600029" />
+![Analysis Endpoint](images/analysis.png)
 ```
 
 ---
